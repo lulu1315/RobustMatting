@@ -60,6 +60,7 @@ void RobustMatting::EstimateAlpha()
     float* pa = (float*)m_initial_alpha.data;
     float* pc = (float*)m_initial_confd.data;
     Vec3f* pimg = (Vec3f*)m_image.data;
+//#pragma omp parallel
     for (int i = 0; i < height; i++)
     {
         for (int j = 0; j < width; j++)
@@ -93,6 +94,7 @@ void RobustMatting::BuildMatrix()
 
     Matx19d mean_1x9 = Matx19d::all(1.0 / 9.0);
     const float eps = 1.0e-7, gamma = 1.0e-7;
+//#pragma omp parallel
     for (int i = 1; i < height - 1; i++)
     {
         for (int j = 1; j < width - 1; j++)
@@ -247,7 +249,7 @@ std::pair<float, float> RobustMatting::compute_alpha_confd(const cv::Vec3f& colo
     int n_fgd_seeds = m_fgd_seeds.size();
     int n_bgd_seeds = m_bgd_seeds.size();
     int n_pairs = n_fgd_seeds * n_bgd_seeds;
-    vector<pair<float, float>> alpha_confd_vec(n_pairs);
+    vector<pair<float, float> > alpha_confd_vec(n_pairs);
     double min_dist_fgd_sq = min_dist_fbgd_sq(color, m_fgd_seeds);
     double min_dist_bgd_sq = min_dist_fbgd_sq(color, m_bgd_seeds);
     int k = 0;

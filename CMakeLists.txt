@@ -1,45 +1,26 @@
-cmake_minimum_required(VERSION 2.9)
-
-set(TARGET_BUILD_PLATFORM x64)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-# Add OpenCV:
-set(OpenCV_STATIC OFF)
-find_package(OpenCV REQUIRED)
-set(OpenCV_FOUND ON)
-include_directories(${OpenCV_INCLUDE_DIRS})
-link_directories(${OpenCV_LIBRARY_DIRS})
-add_definitions(${OpenCV_DEFINITIONS})
-
 project(RobustMatting)
 
-include_directories(./libs/eigen-3.3.3/)
+cmake_minimum_required(VERSION 2.9)
+add_compile_options(-std=c++11)
 
-#add_subdirectory(./libs/utils/)
-#add_subdirectory(./src/generalar/)
+find_package(OpenCV 3.2 REQUIRED)
+find_package(Eigen3 REQUIRED)
+message(STATUS "Eigen3 found: ${EIGEN3_FOUND}")
+message(STATUS "Eigen3 include dir found at ${EIGEN3_INCLUDE_DIR}")
+include_directories(${EIGEN3_INCLUDE_DIR})
+
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set (CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
+endif()
 
 file(GLOB ROBUSTMATTING_SRC
 	./src/robust_matting/*.h
 	./src/robust_matting/*.cpp
 )
+
 add_executable(RobustMatting ${ROBUSTMATTING_SRC})
 
-if(MSVC AND OpenCV_STATIC)
-	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-endif()
-
-target_link_libraries(RobustMatting  
-	${OpenCV_LIBS}
-)
-
-set(BINARY_DEBUG_DIR ${PROJECT_BINARY_DIR}/Debug/)
-set(BINARY_RELEASE_DIR ${PROJECT_BINARY_DIR}/Release/)
-file(MAKE_DIRECTORY ${BINARY_DEBUG_DIR})
-file(MAKE_DIRECTORY ${BINARY_RELEASE_DIR})
-
-file (GLOB DATA_FILES
-	${CMAKE_CURRENT_SOURCE_DIR}/data/*.*
-)
-file (COPY ${DATA_FILES} DESTINATION ${PROJECT_BINARY_DIR}/data/)
+target_link_libraries(RobustMatting  ${OpenCV_LIBS})
