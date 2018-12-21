@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 2.9)
 add_compile_options(-std=c++11)
 
 find_package(OpenCV 3.2 REQUIRED)
+
+#installed eigen3 locally : http://eigen.tuxfamily.org/index.php?title=Main_Page
+#/usr/local/include/eigen3
 find_package(Eigen3 REQUIRED)
 message(STATUS "Eigen3 found: ${EIGEN3_FOUND}")
 message(STATUS "Eigen3 include dir found at ${EIGEN3_INCLUDE_DIR}")
