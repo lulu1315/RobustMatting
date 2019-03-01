@@ -25,7 +25,7 @@ public:
     RobustMatting(const cv::Mat& img, const cv::Mat& trimap);
     ~RobustMatting();
 
-    void                        Run();
+    void                        Run(int niters);
     cv::Mat                     GetFinalMat() const { return m_result; }
 
 private:

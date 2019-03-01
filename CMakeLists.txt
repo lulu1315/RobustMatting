@@ -7,7 +7,7 @@ find_package(OpenCV 3.2 REQUIRED)
 
 #installed eigen3 locally : http://eigen.tuxfamily.org/index.php?title=Main_Page
 #/usr/local/include/eigen3
-find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED PATHS "/usr/include/eigen3/build")
 message(STATUS "Eigen3 found: ${EIGEN3_FOUND}")
 message(STATUS "Eigen3 include dir found at ${EIGEN3_INCLUDE_DIR}")
 include_directories(${EIGEN3_INCLUDE_DIR})

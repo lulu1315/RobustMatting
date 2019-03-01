@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 #include <Eigen/IterativeLinearSolvers>
+#include <iostream>
 
 using namespace std;
 using namespace cv;
@@ -28,20 +29,34 @@ RobustMatting::~RobustMatting()
 {
 }
 
-void RobustMatting::Run()
+void RobustMatting::Run(int niters)
 {
-    int maxiter = 1;
+    int64 start;
+    double timeSec;
+    int maxiter = niters;
+    std::cout << "maxiter : " << maxiter << std::endl;
     for (int iter = 0; iter < maxiter; iter++)
     {
+        std::cout << "iteration : " << iter+1 << std::endl;
+        start = cv::getTickCount();
         init();
+        timeSec = (cv::getTickCount() - start) / cv::getTickFrequency();
+        cout << "Init : " << timeSec << " sec" << endl;
+        start = cv::getTickCount();
         EstimateAlpha();
+        timeSec = (cv::getTickCount() - start) / cv::getTickFrequency();
+        cout << "EstimateAlpha : " << timeSec << " sec" << endl;
+        start = cv::getTickCount();
         BuildMatrix();
+        timeSec = (cv::getTickCount() - start) / cv::getTickFrequency();
+        cout << "BuildMatrix : " << timeSec << " sec" << endl;
         m_result.copyTo(m_trimap);
     }
 }
 
 void RobustMatting::EstimateAlpha()
 {
+    std::cout << ".. Estimating Alpha" << std::endl;
 	Mat temp1, temp2, temp3;
 	erode(m_fgd_map, temp1, Mat());
 	erode(m_bgd_map, temp2, Mat());
@@ -80,6 +95,7 @@ void RobustMatting::EstimateAlpha()
 
 void RobustMatting::BuildMatrix()
 {
+    std::cout << ".. Building Matrix" << std::endl;
     typedef Eigen::SparseMatrix<double> SpMat;
 
     SpMat Lu(m_num_ukn, m_num_ukn);
@@ -197,6 +213,7 @@ void RobustMatting::BuildMatrix()
 
 void RobustMatting::init()
 {
+    //std::cout << "init" << std::endl;
     m_fgd_map = m_trimap == 255;
     m_bgd_map = m_trimap == 0;
     m_akn_map = m_fgd_map + m_bgd_map;
@@ -212,8 +229,6 @@ void RobustMatting::init()
         ptr1[i] = m_ukn_map.data[i] == 255 ? uknidx-- : aknidx++;
         ptr2[i] = i;
     }
-
-
 
 	m_num_fgd = countNonZero(m_fgd_map);
 	m_num_bgd = countNonZero(m_bgd_map);
